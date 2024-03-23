@@ -1,10 +1,4 @@
 
-# include <stdio.h>
-# include <stdlib.h>
-# include <math.h>
-# include <string.h>
-# include <iostream>
-# include <vector>
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -20,12 +14,13 @@ class Dicionario{
     
     Dicionario(){
         vector<string> palavras = {};
-        int quant = ler_arquivo("br-sem-acentos.txt", palavras);
-        
+        int quant = ler_arquivo("dic.txt", palavras);
+        for (string p:palavras){
+            cout << p << endl;
+        }
     };
 
-    
-    
+
     int ler_arquivo(const char* nome_arquivo, vector<string>& palavras){
         std::ifstream file(nome_arquivo);
         std::string word;
