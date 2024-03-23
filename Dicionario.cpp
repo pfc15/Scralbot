@@ -18,18 +18,11 @@ Dicionario::Dicionario(){
     int quant = ler_arquivo("dic.txt", palavras);
     int cont =0;
     //adiconando todos na hash
-    for (string palavra_inteira:palavras){
-        string palavra_partida = string("");
-        for (char letra:palavra_inteira){
-            palavra_partida += letra;
-            n.palavra = palavra_partida;
-            if (palavra_partida==palavra_inteira)
-                n.palavra_completa = true;
-            else n.palavra_completa = false;
-            cont += (add(n)+2)%2;
-            cout << cont<< endl;
-        }
-        
+    for (string p:palavras){
+        n.palavra = p;
+        n.palavra_completa = true;
+        cont += (add(n)+2)%2;
+        //cout << cont<< endl;
     }
 };
 

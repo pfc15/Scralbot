@@ -1,13 +1,19 @@
 
 #include "Dicionario.h"
+# include "Jogador.h"
 using namespace std;
 
 
 int main(){
-    auto start = std::chrono::steady_clock::now();
+    auto start = chrono::steady_clock::now();
     Dicionario *dic = new Dicionario;
     cout << "palavra: " << dic->ht[dic->procura("aba")].palavra << endl;
-    auto end = std::chrono::steady_clock::now();
+    Jogador *j = new Jogador("pedro");
+    cout << "jogador: " << j->nome <<" peças: " << string(j->pecas) << endl;
+    auto end = chrono::steady_clock::now();
     auto diff = end - start;
-    std::cout << std::chrono::duration<double, std::milli>(diff).count() << " ms" << std::endl;
+    cout << chrono::duration<double, milli>(diff).count() << " ms" << endl;
+    free(j);
+    free(dic->ht);
+    free(dic);
 }
