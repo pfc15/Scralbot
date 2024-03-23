@@ -6,27 +6,39 @@ class Jogador
     public:
         char pecas[8];
         string nome;
-        int pontos =0;
+        int ponto =0;
     
-    Jogador(){
-        cout << trocar_pecas() << endl;
+    Jogador(const string nome_){
+        std::srand(std::time(nullptr)+2);
+        string a = string("");
+        for (int i =0; i<8; i++){
+            pecas[i] = tirar_peca();
+        }
+        nome = nome_;
     }
 
-    int trocar_pecas(){
-        std::srand(std::time(nullptr)); // use current time as seed for random generator
-        int random_value = std::rand();
-        return random_value;
+    void troca_peca(vector<int> troca){
+        for (int p:troca){
+            pecas[p] = tirar_peca();
+        }
+    }
+
+    char tirar_peca(){
+        string alfabeto = string("aaaaaaaaaaaaaabbbccccdddddeeeeeeeeeeeffgghhiiiiiiiiiijjkllllllmmmmmmnnnooooooooooopppppqrrrrrrsssssssssttttttuuuuuuuvvxyz");
+        int random_value = rand()%120;
+        cout << random_value << endl;
+
+        return alfabeto.at(random_value);
     }
 
     void add_pontos(int add){
-
+        ponto += add;
     }
 };
 
 
 int main(){
-    Jogador j;
-    
+    Jogador j = Jogador("pedro");
 
 }
 
