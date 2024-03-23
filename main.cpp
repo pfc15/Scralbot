@@ -4,35 +4,59 @@
 # include <math.h>
 # include <string.h>
 # include <iostream>
+# include <vector>
+#include <bits/stdc++.h>
 using namespace std;
 
-int ler_arquivo(const char* nome_arquivo, char*** array_palavras){
-    FILE *arquivo;
-    char*linha = NULL;
-    size_t len = 0;
 
-    arquivo = fopen(nome_arquivo, "r");
-    if (arquivo == NULL){
-        return -1;
-    }
-    int cont =0;
-    while ((getline(&linha,&len,arquivo))!= -1){
-        printf("%d, %s",cont, linha);
-        cont++;
+class Dicionario{
+    public:
+        struct item {
+            string palavra;
+            bool palavra_completa;
+        };
+        struct item *hash;
+        long int M;
+    
+    Dicionario(){
+        vector<string> palavras = {};
+        int quant = ler_arquivo("br-sem-acentos.txt", palavras);
         
-        //strcpy();
-    }
+    };
 
-    fclose(arquivo);
-    if (linha){
-        free(linha);
-    }
+    
+    
+    int ler_arquivo(const char* nome_arquivo, vector<string>& palavras){
+        std::ifstream file(nome_arquivo);
+        std::string word;
+        int count = 0;
+        if (file.is_open()) {
+            while (file >> word) {
+                palavras.push_back(word);
+                count++;
+            }
+            file.close();
+        } else {
+            std::cerr << "Unable to open file: " << nome_arquivo << endl;
+        }
+        return count;
+    };
 
-    return 0;
-}
+    int encode(string chave){
+        long int h = 0;
+        int n =1;
+        for(char l:chave){
+            h += l*pow(73, n);
+            n++;
+        }
+        return h%M;
+    };
+
+};
+
+
 
 int main(){
-    char ** array_palavras = (char**) malloc(sizeof(char*)*100);
-    ler_arquivo("br-sem-acentos.txt", &array_palavras);
-    free(array_palavras);
+    Dicionario *dic = new Dicionario;
+
 }
