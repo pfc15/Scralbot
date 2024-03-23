@@ -1,12 +1,12 @@
 from unidecode import unidecode
 
-file_path = "DICIONARIOS/DicAberto.dict"  # Replace this with the path to your file
+file_path = "DicAberto.dict"  # Replace this with the path to your file
 
 with open(file_path, "r") as file:
     lines = file.readlines()
 palavras = []
 for l in lines:
-    if (not l[:1] == "\t") and l[:1] !="\n" and "-" not in l:
+    if (not l[:1] == "\t") and l[:1] !="\n" and "-" not in l and "!" not in l and "." not in l and len(l)>2:
         l = unidecode(l)
         palavras.append(l[:-1])
 

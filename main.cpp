@@ -20,6 +20,11 @@ class Dicionario{
         }
     };
 
+    void add(long int h, item i){
+        
+
+    }
+
 
     int ler_arquivo(const char* nome_arquivo, vector<string>& palavras){
         std::ifstream file(nome_arquivo);
