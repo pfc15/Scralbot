@@ -21,11 +21,6 @@ int main()
     vector<string> vect; 
     vect.push_back("vsf"); 
     vect.push_back("babaca"); 
-  
-    func(vect); 
-  
-    for (int i = 0; i < vect.size(); i++) 
-        cout << vect[i] << " "; 
-    cout << endl;
-    return 0; 
+    string a = "vsf";
+    if (vect.at(0)==a) cout << "sim!\n";
 }
