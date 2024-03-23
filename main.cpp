@@ -28,27 +28,36 @@ class Dicionario{
         //lendo o dicionario
         vector<string> palavras = {};
         int quant = ler_arquivo("dic.txt", palavras);
-        for (string p:palavras){
-            cout << p << endl;
-        }
-        cout << palavras.size() << endl;
-
+        int cont =0;
         //adiconando todos na hash
-        n.palavra = palavras.at(0);
-        n.palavra_completa = true;
-        add(n);
+        for (string palavra_inteira:palavras){
+            string palavra_partida = string("");
+            for (char letra:palavra_inteira){
+                palavra_partida += letra;
+                n.palavra = palavra_partida;
+                if (palavra_partida==palavra_inteira)
+                    n.palavra_completa = true;
+                else n.palavra_completa = false;
+                cont += (add(n)+2)%2;
+                cout << cont<< endl;
+            }
+            
+        }
+        
     };
 
     int add(item novo){
         int c=0;
-        int h = encode(novo.palavra);
+        long int h = encode(novo.palavra);
         int f = procura(novo.palavra);
         if (f>=0) return -1;
         while(!isNull(ht[h])&&c<COLint){
             h =((h+43)%M);
             c++;
         }
-        if (c>COLint) return -1;
+        if (c>COLint){
+            return -1;
+        }
         ht[h] = novo;
         return 1;
     }
@@ -83,11 +92,11 @@ class Dicionario{
         return count;
     };
 
-    int encode(string chave){
+    long int encode(string chave){
         long int h = 0;
         int n =1;
         for(char l:chave){
-            h += l*pow(73, n);
+            h += l*pow(3, n);
             n++;
         }
         return h%M;
@@ -98,7 +107,11 @@ class Dicionario{
 
 
 int main(){
+    auto start = std::chrono::steady_clock::now();
     Dicionario *dic = new Dicionario;
     cout << "palavra: " << dic->ht[dic->procura("aba")].palavra << endl;
+    auto end = std::chrono::steady_clock::now();
+    auto diff = end - start;
+    std::cout << std::chrono::duration<double, std::milli>(diff).count() << " ms" << std::endl;
 
 }

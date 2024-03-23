@@ -8,19 +8,18 @@
 using namespace std;
 
 
-void func(vector<string>& vect) {
-    char *a = (char*) malloc(sizeof(char)*20);
-    strcpy(a, "ola mundo");
-    vect.insert(vect.end(), a);
-    free(a);
-    
-} 
+long int encode(string chave){
+        long int h = 0;
+        int n =1;
+        for(char l:chave){
+            h += l*pow(17, n);
+            n++;
+        }
+        long int M = pow(3, 12); //tamanho da hash
+        return h%M;
+    };
   
 int main() 
 { 
-    vector<string> vect; 
-    vect.push_back("vsf"); 
-    vect.push_back("babaca"); 
-    string a = "vsf";
-    if (vect.at(0)==a) cout << "sim!\n";
+    cout << encode(string("abacamartado"))<<endl;
 }
