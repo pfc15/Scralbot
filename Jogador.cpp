@@ -21,7 +21,6 @@ char Jogador::sortear_peca(){
         string alfabeto = string("aaaaaaaaaaaaaabbbccccdddddeeeeeeeeeeeffgghhiiiiiiiiiijjkllllllmmmmmmnnnooooooooooopppppqrrrrrrsssssssssttttttuuuuuuuvvxyz");
         int random_value = rand()%120;
         cout << random_value << endl;
-
         return alfabeto.at(random_value);
     }
 
