@@ -3,11 +3,10 @@ using namespace std;
 
 
 Jogador::Jogador(const string nome_){
-    std::srand(std::time(nullptr)+2);
-    for (int i =0; i<8; i++){
+    for (int i =0; i<4; i++){
         pecas.push_back(sortear_peca());
     }
-    pecas[8] = EOF;
+    pecas[4] = EOF;
     nome = nome_;
 }
 
@@ -20,7 +19,6 @@ void Jogador::troca_peca(vector<int> troca){
 char Jogador::sortear_peca(){
         string alfabeto = string("aaaaaaaaaaaaaabbbccccdddddeeeeeeeeeeeffgghhiiiiiiiiiijjkllllllmmmmmmnnnooooooooooopppppqrrrrrrsssssssssttttttuuuuuuuvvxyz");
         int random_value = rand()%120;
-        cout << random_value << endl;
         return alfabeto.at(random_value);
     }
 

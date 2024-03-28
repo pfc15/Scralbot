@@ -42835,7 +42835,6 @@ emundacao
 emerito
 emetico
 emodio
-en
 enaltar
 enaltecer
 enaltecimento

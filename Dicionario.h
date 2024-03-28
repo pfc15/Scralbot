@@ -29,6 +29,8 @@ class Dicionario
 
     long int encode(string) const;
 
+    bool confere_aresta(char a, char b, int index);
+
 };
 
 #endif

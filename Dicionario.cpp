@@ -21,8 +21,7 @@ Dicionario::Dicionario(){
     for (string p:palavras){
         n.palavra = p;
         n.palavra_completa = true;
-        cont += (add(n)+2)%2;
-        //cout << cont<< endl;
+        cont += (add(n)+3)%2;
     }
 };
 
@@ -81,6 +80,10 @@ long int Dicionario::encode(string chave)const{
         return h%M;
     };
 
+bool Dicionario::confere_aresta(char a, char b, int index){
+    bool existe_aresta = false;
+    return true;
+};
 
 
 
