@@ -20,6 +20,8 @@ class Jogo
         vector<vector<char>> tabuleiro_pecas;
         vector<vector<int>> tabuleiro_bonus;
         Dicionario dic;
+        vector<bool> visitados;
+        priority_queue<string> retorno;
         
 
     Jogo(vector<string>  nomes){
@@ -58,6 +60,14 @@ class Jogo
             }
 
         }
+
+        retorno = {};
+        visitados = {};
+        for (int i=0;i<(jogadores.at(0).pecas.size()+1)*(jogadores.at(0).pecas.size()+1);i++){
+            visitados.push_back(false);
+        }
+        dfs(0,string(""), grafo);
+        cout << retorno.top() << endl;
     };
 
     vector<queue<item>> cria_grafo(string pecas){
@@ -117,7 +127,27 @@ class Jogo
         cout << "+" <<endl;
     }
 
+    int dfs(int u, string caminho, vector<queue<item>> grafo){
+        if (visitados[u]){
+            return 0;
+        }
+        caminho += grafo[u].front().letra;
+        if (dic.procura(caminho)>=0){
+            retorno.emplace(caminho);
+        }
 
+        visitados[u] = true;
+        queue<item> fila = grafo[u];
+        fila.pop();
+        int index;
+        while(!fila.empty()){
+            item n = fila.front();
+            fila.pop();
+            dfs(n.pos_grafo,caminho, grafo);
+        }
+        return 1;
+
+    }
 
 };
 
