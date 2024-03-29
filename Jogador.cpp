@@ -3,10 +3,10 @@ using namespace std;
 
 
 Jogador::Jogador(const string nome_){
-    for (int i =0; i<4; i++){
+    for (int i =0; i<7; i++){
         pecas.push_back(sortear_peca());
     }
-    pecas[4] = EOF;
+    pecas[7] = EOF;
     nome = nome_;
 }
 

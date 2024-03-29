@@ -6,5 +6,7 @@ using namespace std;
 
 int main(){
     string a = string("ola mundo");
-    cout << a.erase(0,1) <<endl;
+    a.erase(a.find('o'), 1);
+    cout << a.find('o') << endl;
+
 }

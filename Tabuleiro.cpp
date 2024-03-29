@@ -11,6 +11,9 @@ struct item {
             int pos_grafo;
 };
 
+struct quant_letras;
+
+
 class Jogo
 {
     
@@ -22,6 +25,7 @@ class Jogo
         Dicionario dic;
         vector<bool> visitados;
         priority_queue<string> retorno;
+        vector<string> tentativas;
         
 
     Jogo(vector<string>  nomes){
@@ -43,31 +47,30 @@ class Jogo
         mostrar_tabuleiro();
 
         // fazer ação do jogador 0
-        string aux = jogadores.at(0).pecas;
-        aux += 'a';
+        string pecas = jogadores.at(0).pecas;
+        pecas += 'a';
         int cont =0;
-        vector<queue<item>>  grafo = cria_grafo(aux);
-        for (queue<item> fila:grafo){
-            item n_item = fila.front();
-            fila.pop();
-            printf("cabeça da fila: %c; index: %d", n_item.letra, n_item.pos_grafo);
-            cout <<endl;
-            while (!fila.empty()){
-                item n_item = fila.front();
-                fila.pop();
-                printf("aresta: %c; index: %d", n_item.letra, n_item.pos_grafo);
-                cout <<endl;
-            }
-
-        }
+        vector<queue<item>>  grafo = cria_grafo(pecas);
 
         retorno = {};
-        visitados = {};
-        for (int i=0;i<(jogadores.at(0).pecas.size()+1)*(jogadores.at(0).pecas.size()+1);i++){
-            visitados.push_back(false);
+        
+        
+        for (int i=0;i<8;i++){
+            visitados = {};
+            for (int i=0;i<(jogadores.at(0).pecas.size()+1)*(jogadores.at(0).pecas.size()+1);i++){
+                visitados.push_back(false);
+            }
+            string aux = pecas;
+            aux.erase(i,1);
+            dfs(i,string(""), grafo, aux);
         }
-        dfs(0,string(""), grafo);
-        cout << retorno.top() << endl;
+        
+        while (!retorno.empty()){
+            cout << retorno.top() << endl;
+            retorno.pop();
+        }
+        cout << "tentativas feitas "<<tentativas.size() << endl;
+        
     };
 
     vector<queue<item>> cria_grafo(string pecas){
@@ -86,7 +89,7 @@ class Jogo
                     if (voltas!= pecas.size()-1 && e!=i){
                         n_item.letra = pecas[e];
                         n_item.pos_palavra = i+1;
-                        n_item.pos_grafo = i+((voltas+1)*pecas.size());
+                        n_item.pos_grafo = e+((voltas+1)*pecas.size());
                         fila_item.emplace(n_item);
                     }
                 }
@@ -127,23 +130,32 @@ class Jogo
         cout << "+" <<endl;
     }
 
-    int dfs(int u, string caminho, vector<queue<item>> grafo){
-        if (visitados[u]){
-            return 0;
-        }
+    int dfs(int u, string caminho, vector<queue<item>> grafo, string pecas){
+        //if (visitados[u]){
+        //    return 0;
+        //}
         caminho += grafo[u].front().letra;
+        tentativas.push_back(caminho);
         if (dic.procura(caminho)>=0){
             retorno.emplace(caminho);
         }
 
         visitados[u] = true;
+        
         queue<item> fila = grafo[u];
         fila.pop();
         int index;
+        
         while(!fila.empty()){
             item n = fila.front();
             fila.pop();
-            dfs(n.pos_grafo,caminho, grafo);
+            string aux_s = caminho +n.letra;
+            if (pecas.find(n.letra)!=string::npos && find(tentativas.begin(), tentativas.end(), aux_s)==tentativas.end()){
+                string aux = pecas;
+                aux.erase(pecas.find(n.letra), 1);
+                dfs(n.pos_grafo,caminho, grafo, aux);
+            }
+            
         }
         return 1;
 
