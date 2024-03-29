@@ -11,8 +11,6 @@ struct item {
             int pos_grafo;
 };
 
-struct quant_letras;
-
 
 class Jogo
 {
@@ -23,7 +21,6 @@ class Jogo
         vector<vector<char>> tabuleiro_pecas;
         vector<vector<int>> tabuleiro_bonus;
         Dicionario dic;
-        vector<bool> visitados;
         priority_queue<string> retorno;
         vector<string> tentativas;
         
@@ -56,15 +53,12 @@ class Jogo
         
         
         for (int i=0;i<8;i++){
-            visitados = {};
-            for (int i=0;i<(jogadores.at(0).pecas.size()+1)*(jogadores.at(0).pecas.size()+1);i++){
-                visitados.push_back(false);
-            }
             string aux = pecas;
             aux.erase(i,1);
             dfs(i,string(""), grafo, aux);
         }
         
+        // mostrando resultado
         while (!retorno.empty()){
             cout << retorno.top() << endl;
             retorno.pop();
@@ -131,16 +125,11 @@ class Jogo
     }
 
     int dfs(int u, string caminho, vector<queue<item>> grafo, string pecas){
-        //if (visitados[u]){
-        //    return 0;
-        //}
         caminho += grafo[u].front().letra;
         tentativas.push_back(caminho);
         if (dic.procura(caminho)>=0){
             retorno.emplace(caminho);
         }
-
-        visitados[u] = true;
         
         queue<item> fila = grafo[u];
         fila.pop();
