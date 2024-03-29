@@ -133,7 +133,7 @@ class Jogo
         return tentativas.size();
     }
 
-    void movimento(Jogador j){
+    int movimento(Jogador j){
         string pecas = jogadores.at(0).pecas;
         pair<int, int> pos = escolha_ancora();
         char ancora = tabuleiro_pecas.at(pos.first).at(pos.second);
@@ -150,7 +150,7 @@ class Jogo
             tentaivas_quant += dfs(i,string(""), grafo, aux);
         }
         cout << "dfs completa! " << tentaivas_quant << " tentativas" << endl;
-
+        if (retorno.empty()) return 0;
         string entrega = retorno.top();
         cout << "1palavra: " << entrega << "topo: " << retorno.top() << endl;
         int direcao;
@@ -173,7 +173,7 @@ class Jogo
                 x++;
             }
         }
-        
+        return 1;
         
     }
 
@@ -217,6 +217,6 @@ int main(){
     int i;
     cout << "digite 1 para prox jogador jogar: " ;
     cin >> i;
-    j.movimento(j.jogadores.at(1));
+    cout << j.movimento(j.jogadores.at(1)) << endl;
     j.mostrar_tabuleiro();
 }
