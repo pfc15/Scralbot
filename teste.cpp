@@ -5,8 +5,9 @@ using namespace std;
 
 
 int main(){
-    string a = string("ola mundo");
-    a.erase(a.find('o'), 1);
-    cout << a.find('o') << endl;
+    vector<string> a = {"p", "dsks", "sdsa"};
+    vector< string> b = {"ols", "dsjnks", "salkda"};
+    a.insert(a.end(), b.begin(), b.end());
+    cout << a.size() << endl;
 
 }

@@ -43,27 +43,7 @@ class Jogo
         }
         mostrar_tabuleiro();
 
-        // fazer ação do jogador 0
-        string pecas = jogadores.at(0).pecas;
-        pecas += 'a';
-        int cont =0;
-        vector<queue<item>>  grafo = cria_grafo(pecas);
-
-        retorno = {};
         
-        
-        for (int i=0;i<8;i++){
-            string aux = pecas;
-            aux.erase(i,1);
-            dfs(i,string(""), grafo, aux);
-        }
-        
-        // mostrando resultado
-        while (!retorno.empty()){
-            cout << retorno.top() << endl;
-            retorno.pop();
-        }
-        cout << "tentativas feitas "<<tentativas.size() << endl;
         
     };
 
@@ -95,7 +75,10 @@ class Jogo
 
 
     void mostrar_tabuleiro(){
-        cout << tabuleiro_pecas.size() <<endl;
+        cout << "\033[2J\033[1;1H";
+        for (Jogador j: jogadores){
+            cout <<"nome: " << j.nome << "peças: [" << j.pecas << "]" << endl;
+        }
         int cont =0;
         char l = 'a';
         cout << "  ";
@@ -150,11 +133,40 @@ class Jogo
 
     }
 
+    void movimento(Jogador j){
+        string pecas = jogadores.at(0).pecas;
+        pecas += 'a';
+        vector<queue<item>>  grafo = cria_grafo(pecas);
+
+        retorno = {};
+
+        for (int i=0;i<8;i++){
+            string aux = pecas;
+            aux.erase(i,1);
+            dfs(i,string(""), grafo, aux);
+        }
+        cout << "dfs completa!" << endl;
+        pair<int, int> pos = {7, 6};
+        posicionar(retorno.top(), pos, 0);
+        
+    }
+
+    void posicionar(string palavra, pair<int, int> pos, int direcao){
+        for (char letra:palavra){
+            if (direcao ==0){
+                tabuleiro_pecas.at(pos.first).at(pos.second) = letra;
+                pos.second++;
+            }
+            
+        }
+    }
+
 };
 
 
 int main(){
     vector<string> lista = {string("pedro"), string("pablo")};
     Jogo j = Jogo(lista);
-
+    j.movimento(j.jogadores.at(0));
+    j.mostrar_tabuleiro();
 }
