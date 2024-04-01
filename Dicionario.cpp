@@ -86,17 +86,43 @@ bool Dicionario::confere_aresta(string p){
     while (posicao<palavras.size() && comeco<=final){
         posicao = (comeco +final)/2;
         if (palavras.at(posicao).substr(0, p.size())==p){
-            cout << "ENCONTROU!!" << endl;
             return true;
-        } 
+        }
         if (palavras.at(posicao)>p){
             final = posicao-1;
         } else if (palavras.at(posicao)<p){
             comeco = posicao+1;
         }
     }
-    cout << "NÃO ENCONTRADO" << endl;
     return false;
+};
+
+map<char, int> Dicionario::cria_valores(){
+    map<char, int> valores;
+    valores['a'] = 1;
+    valores['e'] = 1;
+    valores['i'] = 1;
+    valores['o'] = 1;
+    valores['s'] = 1;
+    valores['u'] = 1;
+    valores['m'] = 1;
+    valores['r'] = 1;
+    valores['t'] = 1;
+    valores['d'] = 2; 
+    valores['l'] = 2; 
+    valores['c'] = 2; 
+    valores['p'] = 2; 
+    valores['f'] = 4; 
+    valores['g'] = 4; 
+    valores['h'] = 4; 
+    valores['v'] = 4; 
+    valores['j'] = 5;
+    valores['q'] = 6;
+    valores['x'] = 8;
+    valores['z'] = 8;
+    valores['n'] = 3;
+    valores['b'] = 3;
+    return valores;
 };
 
 

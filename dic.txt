@@ -108795,7 +108795,6 @@ syrio
 syspono
 systase
 systole
-ta
 taalique
 taba
 tabacal

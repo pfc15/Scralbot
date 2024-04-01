@@ -21,11 +21,15 @@ class Jogo
         vector<vector<char>> tabuleiro_pecas;
         vector<vector<int>> tabuleiro_bonus;
         Dicionario dic;
-        priority_queue<string> retorno;
+        priority_queue<pair<int, string>> resultado_palavras;
         vector<string> tentativas;
+        map<char, int> valores_letras;
         
 
     Jogo(vector<string>  nomes){
+        // colocando o valor das letras
+        valores_letras = dic.cria_valores();
+
         // inicializando jogadores
         std::srand(std::time(nullptr));
         for (string nome:nomes){
@@ -42,9 +46,6 @@ class Jogo
             }
         }
         mostrar_tabuleiro();
-
-        
-        
     };
 
     vector<queue<item>> cria_grafo(string pecas){
@@ -79,10 +80,10 @@ class Jogo
             cout <<"nome: " << j.nome << "; peças: [" << j.pecas << "]" << endl;
         }
         int cont =0;
-        char l = 'a';
+        int l = 0;
         cout << "  ";
         for (int i=0;i<15;i++){
-            cout << "  " << l << " ";
+            printf(" %02d ", l);
             l++;
         }
         cout << endl;
@@ -106,13 +107,22 @@ class Jogo
         cout << "+" <<endl;
     }
 
+    int calcula_pontos(string palavra){
+        int pontos =0;
+        for (char letra:palavra){
+            pontos += valores_letras[letra];
+        }
+        return pontos;
+    }
+
     int dfs(int u, string caminho, vector<queue<item>> grafo, string pecas){
         
         // visitando o  nó
         caminho += grafo[u].front().letra;
         tentativas.push_back(caminho);
         if (dic.procura(caminho)>=0){
-            retorno.emplace(caminho);
+            pair<int, string> entrada = {calcula_pontos(caminho), caminho};
+            resultado_palavras.emplace(entrada);
         }
 
         queue<item> fila = grafo[u];
@@ -145,7 +155,7 @@ class Jogo
         }
         vector<queue<item>>  grafo = cria_grafo(pecas);
 
-        retorno = {};
+        resultado_palavras = {};
         int tentaivas_quant =0;
         for (int i=0;i<8;i++){
             string aux = pecas;
@@ -153,9 +163,9 @@ class Jogo
             tentaivas_quant += dfs(i,string(""), grafo, aux);
         }
         cout << "dfs completa! " << tentaivas_quant << " tentativas" << endl;
-        if (retorno.empty()) return 0;
-        string entrega = retorno.top();
-        cout << "1palavra: " << entrega << " topo: " << retorno.top() << endl;
+        if (resultado_palavras.empty()) return 0;
+        string entrega = resultado_palavras.top().second;
+        cout << "1palavra: " << entrega << " topo: " << resultado_palavras.top().second << endl;
         int direcao;
         if (tabuleiro_pecas.at(pos.second).at((pos.first+1)%15)==' '&&tabuleiro_pecas.at(pos.second).at((pos.first-1)%15)==' '){
             direcao =0;
@@ -163,12 +173,9 @@ class Jogo
             direcao=1;
         }
 
-        cout << "2palavra: " << entrega << " topo: " << retorno.top()<< endl;
         int x = pos.first;
         int y = pos.second;
-        cout << "3palavra: " << entrega << " topo: " << retorno.top() << endl;
         for (int i=0;i<entrega.size();i++){
-            cout << "4palavra: " << entrega << " topo: " << retorno.top() << endl;
             tabuleiro_pecas.at(y).at(x) = entrega.at(i);
             if (direcao ==1){
                 y++;
@@ -196,8 +203,8 @@ class Jogo
 
     void posicionar(pair<int, int> pos, int direcao){
         int cont =0; 
-        cout << cont << "ola:0 " << retorno.top() << endl;
-        for (char letra:retorno.top()){
+        cout << cont << "ola:0 " << resultado_palavras.top().second << endl;
+        for (char letra:resultado_palavras.top().second){
             
             cont ++;
             tabuleiro_pecas.at(pos.second).at(pos.first) = letra;
@@ -208,6 +215,9 @@ class Jogo
             }
         }
     }
+
+
+
 
 };
 
@@ -220,6 +230,10 @@ int main(){
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
     std::cout << "Tempo de processamento: " << duration.count() << " milliseconds" << std::endl;
+    while(!j.resultado_palavras.empty()){
+        printf("palavra: %s; pontos: %d\n", j.resultado_palavras.top().second.c_str(), j.resultado_palavras.top().first);
+        j.resultado_palavras.pop();
+    }
 
     j.mostrar_tabuleiro();
     int i;

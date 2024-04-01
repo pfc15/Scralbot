@@ -32,6 +32,7 @@ class Dicionario
 
     bool confere_aresta(string palavra);
 
+    map<char, int> cria_valores();
 };
 
 #endif
