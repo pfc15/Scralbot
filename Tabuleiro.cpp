@@ -74,7 +74,7 @@ class Jogo
     };
 
     void mostrar_tabuleiro(){
-        //cout << "\033[2J\033[1;1H";
+        //cout << "\033[2J\033[1;1H"; //limpa o terminal
         for (Jogador j: jogadores){
             cout <<"nome: " << j.nome << "; peças: [" << j.pecas << "]" << endl;
         }
@@ -123,18 +123,21 @@ class Jogo
             item n = fila.front();
             fila.pop();
             string aux_s = caminho +n.letra;
-            if (pecas.find(n.letra)!=string::npos && find(tentativas.begin(), tentativas.end(), aux_s)==tentativas.end()){
-                string aux = pecas;
-                aux.erase(pecas.find(n.letra), 1);
-                dfs(n.pos_grafo,caminho, grafo, aux);
+            if (dic.confere_aresta(aux_s)){
+                if (pecas.find(n.letra)!=string::npos && find(tentativas.begin(), tentativas.end(), aux_s)==tentativas.end()){
+                    string aux = pecas;
+                    aux.erase(pecas.find(n.letra), 1);
+                    dfs(n.pos_grafo,caminho, grafo, aux);
+                }
             }
+                
             
         }
         return tentativas.size();
     }
 
     int movimento(Jogador j){
-        string pecas = jogadores.at(0).pecas;
+        string pecas = j.pecas;
         pair<int, int> pos = escolha_ancora();
         char ancora = tabuleiro_pecas.at(pos.first).at(pos.second);
         if (ancora != ' '){
@@ -152,7 +155,7 @@ class Jogo
         cout << "dfs completa! " << tentaivas_quant << " tentativas" << endl;
         if (retorno.empty()) return 0;
         string entrega = retorno.top();
-        cout << "1palavra: " << entrega << "topo: " << retorno.top() << endl;
+        cout << "1palavra: " << entrega << " topo: " << retorno.top() << endl;
         int direcao;
         if (tabuleiro_pecas.at(pos.second).at((pos.first+1)%15)==' '&&tabuleiro_pecas.at(pos.second).at((pos.first-1)%15)==' '){
             direcao =0;
@@ -160,12 +163,12 @@ class Jogo
             direcao=1;
         }
 
-        cout << "2palavra: " << entrega << "topo: " << retorno.top()<< endl;
+        cout << "2palavra: " << entrega << " topo: " << retorno.top()<< endl;
         int x = pos.first;
         int y = pos.second;
-        cout << "3palavra: " << entrega << "topo: " << retorno.top() << endl;
+        cout << "3palavra: " << entrega << " topo: " << retorno.top() << endl;
         for (int i=0;i<entrega.size();i++){
-            cout << "4palavra: " << entrega << "topo: " << retorno.top() << endl;
+            cout << "4palavra: " << entrega << " topo: " << retorno.top() << endl;
             tabuleiro_pecas.at(y).at(x) = entrega.at(i);
             if (direcao ==1){
                 y++;
@@ -212,11 +215,20 @@ class Jogo
 int main(){
     vector<string> lista = {string("pedro"), string("pablo")};
     Jogo j = Jogo(lista);
+    auto start = std::chrono::high_resolution_clock::now();
     j.movimento(j.jogadores.at(0));
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    std::cout << "Tempo de processamento: " << duration.count() << " milliseconds" << std::endl;
+
     j.mostrar_tabuleiro();
     int i;
     cout << "digite 1 para prox jogador jogar: " ;
     cin >> i;
+    start = std::chrono::high_resolution_clock::now();
     cout << j.movimento(j.jogadores.at(1)) << endl;
+    end = std::chrono::high_resolution_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    std::cout << "Tempo de processamento: " << duration.count() << " milliseconds" << std::endl;
     j.mostrar_tabuleiro();
 }

@@ -14,7 +14,7 @@ Dicionario::Dicionario(){
     }
 
     //lendo o dicionario
-    vector<string> palavras = {};
+    palavras = {};
     int quant = ler_arquivo("dic.txt", palavras);
     int cont =0;
     //adiconando todos na hash
@@ -80,9 +80,23 @@ long int Dicionario::encode(string chave)const{
         return h%M;
     };
 
-bool Dicionario::confere_aresta(char a, char b, int index){
-    bool existe_aresta = false;
-    return true;
+bool Dicionario::confere_aresta(string p){
+    int comeco = 0; int final = palavras.size();
+    int posicao;
+    while (posicao<palavras.size() && comeco<=final){
+        posicao = (comeco +final)/2;
+        if (palavras.at(posicao).substr(0, p.size())==p){
+            cout << "ENCONTROU!!" << endl;
+            return true;
+        } 
+        if (palavras.at(posicao)>p){
+            final = posicao-1;
+        } else if (palavras.at(posicao)<p){
+            comeco = posicao+1;
+        }
+    }
+    cout << "NÃO ENCONTRADO" << endl;
+    return false;
 };
 
 

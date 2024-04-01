@@ -16,6 +16,7 @@ class Dicionario
     struct item *ht;
     long int M = pow(3, 12); //tamanho da hash
     int COLint = 10; //limite de colisões
+    vector<string> palavras = {};
 
     Dicionario();
 
@@ -29,7 +30,7 @@ class Dicionario
 
     long int encode(string) const;
 
-    bool confere_aresta(char a, char b, int index);
+    bool confere_aresta(string palavra);
 
 };
 
