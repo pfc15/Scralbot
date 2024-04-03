@@ -12,7 +12,8 @@ Jogador::Jogador(const string nome_){
 
 void Jogador::troca_peca(vector<int> troca){
         for (int p:troca){
-            pecas[p] = sortear_peca();
+            char novo = sortear_peca();
+            pecas[p] = novo;
         }
     }
 
@@ -25,6 +26,3 @@ char Jogador::sortear_peca(){
 void Jogador::add_pontos(int add){
         ponto += add;
     }
-
-
-

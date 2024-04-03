@@ -21,7 +21,7 @@ class Jogo
         vector<vector<char>> tabuleiro_pecas;
         vector<vector<int>> tabuleiro_bonus;
         Dicionario dic;
-        priority_queue<pair<int, string>> resultado_palavras;
+        priority_queue<tuple<int, string, pair<int, int>>> resultado_palavras;
         vector<string> tentativas;
         map<char, int> valores_letras;
         
@@ -31,7 +31,7 @@ class Jogo
         valores_letras = dic.cria_valores();
 
         // inicializando jogadores
-        std::srand(std::time(nullptr));
+        srand(time(0));
         for (string nome:nomes){
             Jogador player = Jogador(nome);
             jogadores.push_back(player);
@@ -115,20 +115,23 @@ class Jogo
         return pontos;
     }
 
-    int dfs(int u, string caminho, vector<queue<item>> grafo, string pecas){
+    int dfs(int u, string caminho, vector<queue<item>> grafo, string pecas, pair<int, int> pos){
         
         // visitando o  nó
         caminho += grafo[u].front().letra;
         tentativas.push_back(caminho);
         if (dic.procura(caminho)>=0){
-            pair<int, string> entrada = {calcula_pontos(caminho), caminho};
-            resultado_palavras.emplace(entrada);
+            tuple<int, string, pair<int, int>> entrada = {calcula_pontos(caminho), caminho, pos};
+            if (caminho.find(tabuleiro_pecas.at(pos.second).at(pos.first))!=string::npos || tabuleiro_pecas.at(pos.second).at(pos.first)==' ')
+                resultado_palavras.emplace(entrada);
         }
 
+        // pegandoa as arestas
         queue<item> fila = grafo[u];
         fila.pop();
         int index;
         
+        // enfilerando os novos nós a visitar
         while(!fila.empty()){
             item n = fila.front();
             fila.pop();
@@ -137,112 +140,136 @@ class Jogo
                 if (pecas.find(n.letra)!=string::npos && find(tentativas.begin(), tentativas.end(), aux_s)==tentativas.end()){
                     string aux = pecas;
                     aux.erase(pecas.find(n.letra), 1);
-                    dfs(n.pos_grafo,caminho, grafo, aux);
+                    dfs(n.pos_grafo,caminho, grafo, aux, pos);
                 }
             }
-                
-            
         }
         return tentativas.size();
     }
 
-    int movimento(Jogador j){
+    int movimento(Jogador j, pair<int, int> pos){
         string pecas = j.pecas;
-        pair<int, int> pos = escolha_ancora();
         char ancora = tabuleiro_pecas.at(pos.first).at(pos.second);
         if (ancora != ' '){
             pecas += ancora;
         }
         vector<queue<item>>  grafo = cria_grafo(pecas);
 
-        resultado_palavras = {};
         int tentaivas_quant =0;
+        tentativas = {};
         for (int i=0;i<8;i++){
             string aux = pecas;
             aux.erase(i,1);
-            tentaivas_quant += dfs(i,string(""), grafo, aux);
+            tentaivas_quant += dfs(i,string(""), grafo, aux, pos);
         }
         cout << "dfs completa! " << tentaivas_quant << " tentativas" << endl;
         if (resultado_palavras.empty()) return 0;
-        string entrega = resultado_palavras.top().second;
-        cout << "1palavra: " << entrega << " topo: " << resultado_palavras.top().second << endl;
+        string entrega = get<string>(resultado_palavras.top());
+        cout << "1palavra: " << entrega << " topo: " << get<string>(resultado_palavras.top()) << endl;
+        
+        
+        return 1;
+    }
+
+    void escolha_ancora(){
+        resultado_palavras = {};
+        tentativas = {};
+        pair<int, int> retorno;
+        bool tabuleiro_vazio = true;
+        for (int x=0;x<tabuleiro_pecas.size();x++){
+            for (int y=0;y<tabuleiro_pecas.size();y++){
+                if (tabuleiro_pecas.at(y).at(x) != ' '){
+                    retorno = {x, y};
+                    movimento(jogadores.at(vez),retorno);
+                    tabuleiro_vazio = false;
+                }
+            }
+        }
+        if (tabuleiro_vazio){
+            retorno = {7, 7};
+            movimento(jogadores.at(vez), retorno);
+        }
+        vector<int> index_pecas_troca = {};
+        if (!resultado_palavras.empty()){
+            tuple<int, string, pair<int, int>> vizu = resultado_palavras.top();
+            cout << "plavra: " << get<string>(vizu) << " pos: [" << get<pair<int, int>>(vizu).first << ", " << get<pair<int, int>>(vizu).second << "] ancora: " << get<int>(vizu) << endl;
+            posicionar(resultado_palavras.top());
+            for(char letra:get<string>(resultado_palavras.top())){
+                index_pecas_troca.push_back(jogadores.at(vez).pecas.find(letra));
+            }
+            jogadores.at(vez).troca_peca(index_pecas_troca);
+        } else{
+            for(int i=0;i<jogadores.at(vez).pecas.size();i++){
+                index_pecas_troca.push_back(i);
+            }
+            jogadores.at(vez).troca_peca(index_pecas_troca);
+            cout << "sem  palavras válidas" << endl; 
+        }
+        vez = (vez+1)%jogadores.size();
+    }
+
+    void posicionar(tuple<int, string, pair<int, int>> topo){
+        cout <<"entrei em posicionar!" << endl;
+        
+        pair<int, int> pos = get<pair<int, int>>(topo); 
+        string palavra = get<string>(topo);
+        int ancora = palavra.find(tabuleiro_pecas.at(pos.second).at(pos.first));
+        int x = pos.first;
+        int y = pos.second;
+        cout << "plavra: " << palavra << "pos: [" << pos.first << ", " << pos.second << "] ancora: " << ancora << endl;
+        // definir direcao
         int direcao;
         if (tabuleiro_pecas.at(pos.second).at((pos.first+1)%15)==' '&&tabuleiro_pecas.at(pos.second).at((pos.first-1)%15)==' '){
             direcao =0;
-        } else {
+        } else if (tabuleiro_pecas.at((pos.second+1)%15).at(pos.first)==' '&&tabuleiro_pecas.at((pos.second-1)%15).at(pos.first)==' '){
             direcao=1;
         }
 
-        int x = pos.first;
-        int y = pos.second;
-        for (int i=0;i<entrega.size();i++){
-            tabuleiro_pecas.at(y).at(x) = entrega.at(i);
+        // parte antes da ancora
+        for (int i=ancora-1;i>=0;i--){
+            if (direcao ==1){
+                y--;
+            } else if (direcao ==0){
+                x--;
+            }
+            tabuleiro_pecas.at(y).at(x) = palavra.at(i);
+        }
+        x = pos.first;
+        y = pos.second;
+
+        // parte depois da ancora
+        for (int i=ancora+1;i<palavra.size();i++){
             if (direcao ==1){
                 y++;
             } else if (direcao ==0){
                 x++;
             }
-        }
-        return 1;
-        
-    }
-
-    pair<int, int> escolha_ancora(){
-        pair<int, int> retorno; 
-        for (int x=0;x<tabuleiro_pecas.size();x++){
-            for (int y=0;y<tabuleiro_pecas.size();y++){
-                if (tabuleiro_pecas.at(y).at(x) == 'a'|| tabuleiro_pecas.at(y).at(x) == 'e' || tabuleiro_pecas.at(y).at(x) == 'i' || tabuleiro_pecas.at(y).at(x) == 'o' || tabuleiro_pecas.at(y).at(x) == 'u'){
-                    retorno = {x, y};
-                    return retorno;
-                }
-            }
-        }
-        retorno = {7, 6};
-        return retorno;
-    }
-
-    void posicionar(pair<int, int> pos, int direcao){
-        int cont =0; 
-        cout << cont << "ola:0 " << resultado_palavras.top().second << endl;
-        for (char letra:resultado_palavras.top().second){
-            
-            cont ++;
-            tabuleiro_pecas.at(pos.second).at(pos.first) = letra;
-            if (direcao ==1){
-                pos.second++;
-            } else if (direcao ==0){
-                pos.first++;
-            }
+            tabuleiro_pecas.at(y).at(x) = palavra.at(i);
         }
     }
-
-
-
-
 };
 
 
 int main(){
     vector<string> lista = {string("pedro"), string("pablo")};
     Jogo j = Jogo(lista);
-    auto start = std::chrono::high_resolution_clock::now();
-    j.movimento(j.jogadores.at(0));
-    auto end = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    std::cout << "Tempo de processamento: " << duration.count() << " milliseconds" << std::endl;
-    while(!j.resultado_palavras.empty()){
-        printf("palavra: %s; pontos: %d\n", j.resultado_palavras.top().second.c_str(), j.resultado_palavras.top().first);
-        j.resultado_palavras.pop();
+    int i = 0;
+    j.vez =0;
+    while(i!=-1){
+        auto start = std::chrono::high_resolution_clock::now();
+        j.escolha_ancora();
+        auto end = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+        std::cout << "Tempo de processamento: " << duration.count() << " milliseconds" << std::endl;
+        while(!j.resultado_palavras.empty()){
+            printf("palavra: %s; pontos: %d; posição: [%d, %d]\n", get<string>(j.resultado_palavras.top()).c_str(), get<int>(j.resultado_palavras.top()), get<pair<int, int>>(j.resultado_palavras.top()).first, get<pair<int, int>>(j.resultado_palavras.top()));
+            j.resultado_palavras.pop();
+        }
+        j.mostrar_tabuleiro();
+        cout << "digite 1 para prox jogador jogar: " ;
+        cin >> i;
+        j.vez = (j.vez+1)%j.jogadores.size();
     }
-
-    j.mostrar_tabuleiro();
-    int i;
-    cout << "digite 1 para prox jogador jogar: " ;
-    cin >> i;
-    start = std::chrono::high_resolution_clock::now();
-    cout << j.movimento(j.jogadores.at(1)) << endl;
-    end = std::chrono::high_resolution_clock::now();
-    duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    std::cout << "Tempo de processamento: " << duration.count() << " milliseconds" << std::endl;
-    j.mostrar_tabuleiro();
+    
+    
 }
