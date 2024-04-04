@@ -15,7 +15,7 @@ Dicionario::Dicionario(){
 
     //lendo o dicionario
     palavras = {};
-    int quant = ler_arquivo("dic.txt", palavras);
+    int quant = ler_arquivo("../dic.txt", palavras);
     int cont =0;
     //adiconando todos na hash
     for (string p:palavras){

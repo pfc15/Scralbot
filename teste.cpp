@@ -3,11 +3,12 @@ using namespace std;
 
 
 int main(){
-    string a = string("ola");
-    int num = a.find('l');
-    if (a.find('l')!=string::npos){
-        cout <<"num: " <<num <<endl;
-    }
+    tuple<int, long int> a = {1, 2};
+
+    int s1 = get<int> (a);
+    int s2 = get<long int> (a);
+    if (-1)
+        cout << s1 <<" " << s2 <<endl;
     
     
 

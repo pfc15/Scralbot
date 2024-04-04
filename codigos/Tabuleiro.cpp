@@ -21,7 +21,7 @@ class Jogo
         vector<vector<char>> tabuleiro_pecas;
         vector<vector<int>> tabuleiro_bonus;
         Dicionario dic;
-        priority_queue<tuple<int, string, pair<int, int>>> resultado_palavras;
+        priority_queue<tuple<long int, string, pair<int, int>, int>> resultado_palavras;
         vector<string> tentativas;
         map<char, int> valores_letras;
         
@@ -38,16 +38,25 @@ class Jogo
         }
 
         // init da matiz
-        for (int i=0; i<15;i++){
+        vector<char> linha_mortas;
+        for (int i=0; i<17;i++) linha_mortas.push_back('/');
+        tabuleiro_pecas.push_back(linha_mortas);
+        for (int i=1; i<16;i++){
             vector<char> aux = {};
             tabuleiro_pecas.push_back(aux);
-            for (int e=0;e<15;e++){
+            tabuleiro_pecas.at(i).push_back('/');
+            for (int e=1;e<16;e++){
                 tabuleiro_pecas.at(i).push_back(' ');
             }
+            tabuleiro_pecas.at(i).push_back('/');
         }
-        mostrar_tabuleiro();
-    };
+        tabuleiro_pecas.push_back(linha_mortas);
+        cout << tabuleiro_pecas.at(15).size() << endl;
 
+        mostrar_tabuleiro();
+        cout << "criei o objeto!" << endl;
+    };
+ 
     vector<queue<item>> cria_grafo(string pecas){
 
         vector<queue<item>> grafo;
@@ -80,22 +89,20 @@ class Jogo
             cout <<"nome: " << j.nome << "; peças: [" << j.pecas << "]" << endl;
         }
         int cont =0;
-        int l = 0;
         cout << "  ";
         for (int i=0;i<15;i++){
-            printf(" %02d ", l);
-            l++;
+            printf(" %02d ", i);
         }
         cout << endl;
-        for (vector<char> linha:tabuleiro_pecas){
+        for (int e=1;e<16;e++){
             cout <<"  ";
             for (int i=0;i<(15);i++){
                 cout << "+---";
             }
             cout << "+" <<endl;
             printf("%02d", cont);
-            for (char letra: linha){
-                cout << "| " << letra << " ";
+            for (int i=1;i<tabuleiro_pecas.at(e).size()-1;i++){
+                cout << "| " << tabuleiro_pecas.at(e).at(i) << " ";
             }
             cout << "|" << endl;
             cont++;
@@ -107,13 +114,70 @@ class Jogo
         cout << "+" <<endl;
     }
 
-    int calcula_pontos(string palavra){
-        int pontos =0;
+    long int calcula_pontos(string palavra){
+        long int pontos =0;
         for (char letra:palavra){
             pontos += valores_letras[letra];
         }
         return pontos;
     }
+
+    int confere_movimento_legal(string palavra, pair<int, int> pos){
+        char ancora = tabuleiro_pecas.at(pos.second).at(pos.first);
+        vector<int> index_ancoras = {};
+        int ancora_index = palavra.find(ancora);
+        for (int i=0;i<palavra.size(); i++){
+            if (palavra.at(i) == ancora){
+                index_ancoras.push_back(i);
+            }
+        }
+        if (ancora == ' ') return ancora_index;
+        bool legal = true;
+        for (int index:index_ancoras){
+            int direcao = get_direcao(pos);
+            if (direcao == -1) legal = false;
+            int x = pos.first, y= pos.second;
+            for (int i=index-1;i>=0;i--){
+                if (direcao ==1){
+                    y--;
+                    if (tabuleiro_pecas.at(y-1).at(x) != ' ' || tabuleiro_pecas.at(y).at(x-1) != ' ' || tabuleiro_pecas.at(y).at(x+1) != ' '){
+                        legal = false;
+                        break;
+                    }
+                        
+                } else if (direcao ==0){
+                    x--;
+                    if (tabuleiro_pecas.at(y).at(x-1) != ' ' || tabuleiro_pecas.at(y-1).at(x) != ' ' || tabuleiro_pecas.at(y+1).at(x) != ' '){
+                        legal = false;
+                        break;
+                    }
+                }
+            }
+            
+            for (int i=ancora+1;i<palavra.size(),legal!=true;i++){
+                if (direcao ==1){
+                    y++;
+                    if (tabuleiro_pecas.at(y+1).at(x) != ' ' || tabuleiro_pecas.at(y).at(x-1) != ' ' || tabuleiro_pecas.at(y).at(x+1) != ' '){
+                        legal = false;
+                        break;
+                    }
+                        
+                } else if (direcao ==0){
+                    x++;
+                    if (tabuleiro_pecas.at(y).at(x+1) != ' ' || tabuleiro_pecas.at(y-1).at(x) != ' ' || tabuleiro_pecas.at(y+1).at(x) != ' '){
+                        legal = false;
+                        break;
+                    }
+                        
+                }
+            }
+            if (legal)
+                return index;
+        }
+        return -1;
+}
+        
+    
 
     int dfs(int u, string caminho, vector<queue<item>> grafo, string pecas, pair<int, int> pos){
         
@@ -121,8 +185,9 @@ class Jogo
         caminho += grafo[u].front().letra;
         tentativas.push_back(caminho);
         if (dic.procura(caminho)>=0){
-            tuple<int, string, pair<int, int>> entrada = {calcula_pontos(caminho), caminho, pos};
-            if (caminho.find(tabuleiro_pecas.at(pos.second).at(pos.first))!=string::npos || tabuleiro_pecas.at(pos.second).at(pos.first)==' ')
+            int index_ancora = confere_movimento_legal(caminho, pos);
+            tuple<long int, string, pair<int, int>, int> entrada = {calcula_pontos(caminho), caminho, pos, index_ancora};
+            if  (index_ancora>=0|| tabuleiro_pecas.at(pos.second).at(pos.first)==' ')
                 resultado_palavras.emplace(entrada);
         }
 
@@ -147,7 +212,7 @@ class Jogo
         return tentativas.size();
     }
 
-    int movimento(Jogador j, pair<int, int> pos){
+    int busca_palavra(Jogador j, pair<int, int> pos){
         string pecas = j.pecas;
         char ancora = tabuleiro_pecas.at(pos.first).at(pos.second);
         if (ancora != ' '){
@@ -171,31 +236,37 @@ class Jogo
         return 1;
     }
 
-    void escolha_ancora(){
+    void movimento(){
         resultado_palavras = {};
         tentativas = {};
         pair<int, int> retorno;
         bool tabuleiro_vazio = true;
-        for (int x=0;x<tabuleiro_pecas.size();x++){
-            for (int y=0;y<tabuleiro_pecas.size();y++){
-                if (tabuleiro_pecas.at(y).at(x) != ' '){
-                    retorno = {x, y};
-                    movimento(jogadores.at(vez),retorno);
+        printf("procurando por letras\n");
+        // procurando por letras
+        for (int x=1;x<tabuleiro_pecas.size()-1;x++){
+            for (int y=1;y<tabuleiro_pecas.size()-1;y++){
+                retorno = {x, y};
+                if (analise_pos(retorno)){
+                    busca_palavra(jogadores.at(vez),retorno);
                     tabuleiro_vazio = false;
                 }
             }
         }
         if (tabuleiro_vazio){
-            retorno = {7, 7};
-            movimento(jogadores.at(vez), retorno);
+            retorno = {8, 8};
+            busca_palavra(jogadores.at(vez), retorno);
         }
+
+        // colocando as peças no tabuleiro
         vector<int> index_pecas_troca = {};
         if (!resultado_palavras.empty()){
-            tuple<int, string, pair<int, int>> vizu = resultado_palavras.top();
+            tuple<long int, string, pair<int, int>, int> vizu = resultado_palavras.top();
             cout << "plavra: " << get<string>(vizu) << " pos: [" << get<pair<int, int>>(vizu).first << ", " << get<pair<int, int>>(vizu).second << "] ancora: " << get<int>(vizu) << endl;
             posicionar(resultado_palavras.top());
             for(char letra:get<string>(resultado_palavras.top())){
-                index_pecas_troca.push_back(jogadores.at(vez).pecas.find(letra));
+                int index = jogadores.at(vez).pecas.find(letra);
+                if (index>=0)
+                    index_pecas_troca.push_back(index);
             }
             jogadores.at(vez).troca_peca(index_pecas_troca);
         } else{
@@ -206,39 +277,55 @@ class Jogo
             cout << "sem  palavras válidas" << endl; 
         }
         vez = (vez+1)%jogadores.size();
+        cout << "vez: " <<vez << endl;
     }
 
-    void posicionar(tuple<int, string, pair<int, int>> topo){
-        cout <<"entrei em posicionar!" << endl;
+    int get_direcao(pair<int, int> pos){
+        if (tabuleiro_pecas.at(pos.second).at((pos.first+1)%17)==' '&&tabuleiro_pecas.at(pos.second).at((pos.first-1)%17)==' '){
+            return 0; // horizontal
+        } else if (tabuleiro_pecas.at((pos.second+1)%17).at(pos.first)==' '&&tabuleiro_pecas.at((pos.second-1)%17).at(pos.first)==' '){
+            return 1; // vertical
+        }
+        return -1;
+    }
+
+    void posicionar(tuple<long int, string, pair<int, int>, int> topo){
         
         pair<int, int> pos = get<pair<int, int>>(topo); 
         string palavra = get<string>(topo);
-        int ancora = palavra.find(tabuleiro_pecas.at(pos.second).at(pos.first));
+        int ancora = get<int>(topo);
         int x = pos.first;
         int y = pos.second;
-        cout << "plavra: " << palavra << "pos: [" << pos.first << ", " << pos.second << "] ancora: " << ancora << endl;
+        cout << "plavra: " << palavra << " pos: [" << pos.first << ", " << pos.second << "] ancora: " << ancora << endl;
         // definir direcao
-        int direcao;
-        if (tabuleiro_pecas.at(pos.second).at((pos.first+1)%15)==' '&&tabuleiro_pecas.at(pos.second).at((pos.first-1)%15)==' '){
-            direcao =0;
-        } else if (tabuleiro_pecas.at((pos.second+1)%15).at(pos.first)==' '&&tabuleiro_pecas.at((pos.second-1)%15).at(pos.first)==' '){
-            direcao=1;
-        }
+        int direcao = get_direcao(pos);
+        
 
         // parte antes da ancora
-        for (int i=ancora-1;i>=0;i--){
+        int meio = ancora -1;
+        if (ancora == -1){
+            meio = palavra.size()/2;
+            x++; 
+        }
+        
+        for (int i=meio;i>=0;i--){
             if (direcao ==1){
                 y--;
             } else if (direcao ==0){
                 x--;
             }
             tabuleiro_pecas.at(y).at(x) = palavra.at(i);
+            
         }
         x = pos.first;
         y = pos.second;
 
+        meio = ancora+1;
+        if (ancora ==-1){
+            meio = (palavra.size()/2)+1;
+        }
         // parte depois da ancora
-        for (int i=ancora+1;i<palavra.size();i++){
+        for (int i=meio;i<palavra.size();i++){
             if (direcao ==1){
                 y++;
             } else if (direcao ==0){
@@ -246,8 +333,29 @@ class Jogo
             }
             tabuleiro_pecas.at(y).at(x) = palavra.at(i);
         }
+        mostrar_tabuleiro();
+    }
+
+    // anailise de se a posição é viável
+    bool analise_pos(pair<int, int> pos){
+        if (tabuleiro_pecas.at(pos.second).at(pos.first) != ' '){
+            // verificando se é a ponta do tabuleiro
+            if (tabuleiro_pecas.at(pos.second).at(pos.first) == '/'){
+                return false;
+            }
+            // vendo se a peça esta cercada por outras peças
+            int direcao = get_direcao(pos);
+            if (direcao==-1){
+                return false;
+            }
+
+            return true;
+        }
+
+        return false;
     }
 };
+
 
 
 int main(){
@@ -257,19 +365,16 @@ int main(){
     j.vez =0;
     while(i!=-1){
         auto start = std::chrono::high_resolution_clock::now();
-        j.escolha_ancora();
+        j.movimento();
         auto end = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
         std::cout << "Tempo de processamento: " << duration.count() << " milliseconds" << std::endl;
-        while(!j.resultado_palavras.empty()){
-            printf("palavra: %s; pontos: %d; posição: [%d, %d]\n", get<string>(j.resultado_palavras.top()).c_str(), get<int>(j.resultado_palavras.top()), get<pair<int, int>>(j.resultado_palavras.top()).first, get<pair<int, int>>(j.resultado_palavras.top()));
-            j.resultado_palavras.pop();
-        }
-        j.mostrar_tabuleiro();
+        //while(!j.resultado_palavras.empty()){
+        //    printf("palavra: %s; pontos: %d; posição: [%d, %d]\n", get<string>(j.resultado_palavras.top()).c_str(), get<int>(j.resultado_palavras.top()), get<pair<int, int>>(j.resultado_palavras.top()).first, get<pair<int, int>>(j.resultado_palavras.top()));
+        //    j.resultado_palavras.pop();
+        //}
         cout << "digite 1 para prox jogador jogar: " ;
         cin >> i;
-        j.vez = (j.vez+1)%j.jogadores.size();
     }
-    
     
 }
