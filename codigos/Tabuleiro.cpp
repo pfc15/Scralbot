@@ -11,6 +11,13 @@ struct item {
     int pos_grafo;
 };
 
+struct bonus;
+struct bonus {
+    string tipo;
+    int multiplicador;
+};
+
+
 
 class Jogo
 {
@@ -19,7 +26,7 @@ class Jogo
         vector<Jogador> jogadores;
         int vez;
         vector<vector<char>> tabuleiro_pecas;
-        vector<vector<int>> tabuleiro_bonus;
+        vector<vector<bonus>> tabuleiro_bonus;
         Dicionario dic;
         priority_queue<tuple<long int, string, pair<int, int>, int>> resultado_palavras;
         vector<string> tentativas;
@@ -51,12 +58,53 @@ class Jogo
             tabuleiro_pecas.at(i).push_back('/');
         }
         tabuleiro_pecas.push_back(linha_mortas);
-        cout << tabuleiro_pecas.at(15).size() << endl;
+
+        init_matriz_bonus();
+    
 
         mostrar_tabuleiro();
         cout << "criei o objeto!" << endl;
     };
- 
+
+    void init_matriz_bonus(){
+        bonus neutro = {"neutro", 1};
+        vector<bonus> limpo = {};
+        for (int y=0;y<17;y++){
+            tabuleiro_bonus.push_back(limpo);
+            for (int x=0; x<17;x++){
+                tabuleiro_bonus.at(y).push_back(neutro);
+            }
+        }
+        vector<pair<int, int>> posicoes = {{7,7}, {7,9}, {9, 9}, {9, 7}, {4, 8}, {3, 7}  
+,{3, 9}, {1, 4}, {1, 12}, {8, 4}, {7, 3}, {9, 3}, {4, 1}, {12, 1}
+,{12, 8}, {13, 7}, {13, 9}, {15, 4}, {15, 11}, {8, 12}, {7, 13}
+,{9, 13}, {4, 15}, {12, 15}};
+        bonus letra_dupla = {"letra", 2};
+        for (pair<int, int> pos:posicoes){
+            tabuleiro_bonus.at(pos.second).at(pos.first) = letra_dupla;
+        }
+        posicoes = {{6,6}, {6, 10}, {10, 6}, {10, 10}, {2, 6},      
+{2, 10}, {6, 2}, {10, 2}, {14, 6}, {14, 10}, {5, 14}, {10, 14}};
+        bonus letra_tripla = {"letra", 3};
+        for (pair<int, int> pos:posicoes){
+            tabuleiro_bonus.at(pos.second).at(pos.first) = letra_tripla;
+        }
+        posicoes = {{5, 5}, {5, 11}, {11, 5}, {11, 11}, {4, 4}
+,{4, 12}, {12, 4}, {12, 12}, {3, 3}, {3, 13}, {13, 3}, {13, 13}
+,{2, 2}, {2, 14}, {14, 2}, {14, 14}};
+        bonus palavra_dupla = {"palavra", 2};
+        for (pair<int, int> pos:posicoes){
+            tabuleiro_bonus.at(pos.second).at(pos.first) = palavra_dupla;
+        }
+        posicoes = {{1, 1}, {15, 15}, {1, 15}, {15, 1}, {1, 8}    
+,{8, 1}, {15, 8}, {8, 15}};
+        bonus palavra_tripla = {"palavra", 3};
+        for (pair<int, int> pos:posicoes){
+            tabuleiro_bonus.at(pos.second).at(pos.first) = palavra_tripla;
+        }
+
+    };
+
     vector<queue<item>> cria_grafo(string pecas){
 
         vector<queue<item>> grafo;
@@ -86,7 +134,7 @@ class Jogo
     void mostrar_tabuleiro(){
         //cout << "\033[2J\033[1;1H"; //limpa o terminal
         for (Jogador j: jogadores){
-            cout <<"nome: " << j.nome << "; peças: [" << j.pecas << "]" << endl;
+            cout <<"nome: " << j.nome << "; peças: [" << j.pecas << "]; pontos: " << j.ponto << endl;
         }
         int cont =0;
         cout << "  ";
@@ -102,7 +150,17 @@ class Jogo
             cout << "+" <<endl;
             printf("%02d", cont);
             for (int i=1;i<tabuleiro_pecas.at(e).size()-1;i++){
-                cout << "| " << tabuleiro_pecas.at(e).at(i) << " ";
+                if (tabuleiro_bonus.at(e).at(i).tipo == "neutro"){
+                    cout << "| " << tabuleiro_pecas.at(e).at(i) << " ";
+                } else if (tabuleiro_pecas.at(e).at(i) == ' '){
+                    if (tabuleiro_bonus.at(e).at(i).tipo == "palavra"){
+                        printf("| \x1B[31m*\033[0m ");
+                    } else if(tabuleiro_bonus.at(e).at(i).tipo == "letra"){
+                        printf("| \x1B[34m*\033[0m ");
+                    }
+                }
+                
+                
             }
             cout << "|" << endl;
             cont++;
@@ -269,13 +327,19 @@ class Jogo
             tuple<long int, string, pair<int, int>, int> vizu = resultado_palavras.top();
             cout << "plavra: " << get<string>(vizu) << " pos: [" << get<pair<int, int>>(vizu).first << ", " << get<pair<int, int>>(vizu).second << "] ancora: " << get<int>(vizu) << endl;
             posicionar(resultado_palavras.top());
+
+            // trocando peças
             for(char letra:get<string>(resultado_palavras.top())){
                 int index = jogadores.at(vez).pecas.find(letra);
                 if (index>=0)
                     index_pecas_troca.push_back(index);
             }
             jogadores.at(vez).troca_peca(index_pecas_troca);
+
+
+            jogadores.at(vez).ponto += get<long int>(resultado_palavras.top());
         } else{
+            // troca todas as pecas
             for(int i=0;i<jogadores.at(vez).pecas.size();i++){
                 index_pecas_troca.push_back(i);
             }
@@ -283,7 +347,7 @@ class Jogo
             cout << "sem  palavras válidas" << endl; 
         }
         vez = (vez+1)%jogadores.size();
-        cout << "vez: " <<vez << endl;
+        mostrar_tabuleiro();
     }
 
     int get_direcao(pair<int, int> pos){
@@ -339,7 +403,6 @@ class Jogo
             }
             tabuleiro_pecas.at(y).at(x) = palavra.at(i);
         }
-        mostrar_tabuleiro();
     }
 
     // anailise de se a posição é viável
@@ -371,14 +434,11 @@ int main(){
     j.vez =0;
     while(i!=-1){
         auto start = std::chrono::high_resolution_clock::now();
-        j.movimento();
+        //j.movimento();
         auto end = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
         std::cout << "Tempo de processamento: " << duration.count() << " milliseconds" << std::endl;
-        //while(!j.resultado_palavras.empty()){
-        //    printf("palavra: %s; pontos: %d; posição: [%d, %d]\n", get<string>(j.resultado_palavras.top()).c_str(), get<int>(j.resultado_palavras.top()), get<pair<int, int>>(j.resultado_palavras.top()).first, get<pair<int, int>>(j.resultado_palavras.top()));
-        //    j.resultado_palavras.pop();
-        //}
+        
         cout << "digite 1 para prox jogador jogar: " ;
         cin >> i;
     }
