@@ -134,6 +134,7 @@ class Jogo
         if (ancora == ' ') return ancora_index;
         bool legal = true;
         for (int index:index_ancoras){
+            legal =true;
             int direcao = get_direcao(pos);
             if (direcao == -1) legal = false;
             int x = pos.first, y= pos.second;
@@ -150,11 +151,12 @@ class Jogo
                     if (tabuleiro_pecas.at(y).at(x-1) != ' ' || tabuleiro_pecas.at(y-1).at(x) != ' ' || tabuleiro_pecas.at(y+1).at(x) != ' '){
                         legal = false;
                         break;
-                    }
+                    } 
                 }
             }
+            x = pos.first; y= pos.second;
             
-            for (int i=ancora+1;i<palavra.size(),legal!=true;i++){
+            for (int i=index+1;i<palavra.size();i++){
                 if (direcao ==1){
                     y++;
                     if (tabuleiro_pecas.at(y+1).at(x) != ' ' || tabuleiro_pecas.at(y).at(x-1) != ' ' || tabuleiro_pecas.at(y).at(x+1) != ' '){
@@ -171,8 +173,10 @@ class Jogo
                         
                 }
             }
-            if (legal)
+            if (legal){
                 return index;
+            }
+                
         }
         return -1;
 }
@@ -227,10 +231,12 @@ class Jogo
             aux.erase(i,1);
             tentaivas_quant += dfs(i,string(""), grafo, aux, pos);
         }
+        cout << "-=-=-=-=-=-=-=-=-=-=-=-=-==--=-=-=-=-=-=-=-=-==-===-=-=-==" << endl;
         cout << "dfs completa! " << tentaivas_quant << " tentativas" << endl;
         if (resultado_palavras.empty()) return 0;
         string entrega = get<string>(resultado_palavras.top());
-        cout << "1palavra: " << entrega << " topo: " << get<string>(resultado_palavras.top()) << endl;
+        pair< int, int> top_pos = get<pair<int, int>>(resultado_palavras.top());
+        cout << "1palavra: " << entrega << " topo: " << get<string>(resultado_palavras.top()) << " pos: " <<top_pos.first <<" " <<top_pos.second<< endl;
         
         
         return 1;
