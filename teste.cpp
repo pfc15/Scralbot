@@ -3,11 +3,11 @@ using namespace std;
 
 
 int main(){
-    printf("\x1B[31mTexting\033[0m\t\t");
-    printf("\x1B[32mTexting\033[0m\t\t");
-    printf("\x1B[33mTexting\033[0m\t\t");
-    printf("\x1B[34mTexting\033[0m\t\t");
-    printf("\x1B[35mTexting\033[0m\n");
+    printf("\x1B[31mTexting\033[0m\t\t"); // vermelho
+    printf("\x1B[32mTexting\033[0m\t\t"); // verde
+    printf("\x1B[33mTexting\033[0m\t\t"); // amarelo
+    printf("\x1B[34mTexting\033[0m\t\t"); // azul
+    printf("\x1B[35mTexting\033[0m\n"); // roxo
     
     printf("\x1B[36mTexting\033[0m\t\t");
     printf("\x1B[36mTexting\033[0m\t\t");

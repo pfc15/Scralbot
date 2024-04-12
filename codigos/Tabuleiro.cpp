@@ -76,28 +76,28 @@ class Jogo
             }
         }
         vector<pair<int, int>> posicoes = {{7,7}, {7,9}, {9, 9}, {9, 7}, {4, 8}, {3, 7}  
-,{3, 9}, {1, 4}, {1, 12}, {8, 4}, {7, 3}, {9, 3}, {4, 1}, {12, 1}
-,{12, 8}, {13, 7}, {13, 9}, {15, 4}, {15, 11}, {8, 12}, {7, 13}
-,{9, 13}, {4, 15}, {12, 15}};
+        ,{3, 9}, {1, 4}, {1, 12}, {8, 4}, {7, 3}, {9, 3}, {4, 1}, {12, 1}
+        ,{12, 8}, {13, 7}, {13, 9}, {15, 4}, {15, 11}, {8, 12}, {7, 13}
+        ,{9, 13}, {4, 15}, {12, 15}};
         bonus letra_dupla = {"letra", 2};
         for (pair<int, int> pos:posicoes){
             tabuleiro_bonus.at(pos.second).at(pos.first) = letra_dupla;
         }
         posicoes = {{6,6}, {6, 10}, {10, 6}, {10, 10}, {2, 6},      
-{2, 10}, {6, 2}, {10, 2}, {14, 6}, {14, 10}, {5, 14}, {10, 14}};
+        {2, 10}, {6, 2}, {10, 2}, {14, 6}, {14, 10}, {5, 14}, {10, 14}};
         bonus letra_tripla = {"letra", 3};
         for (pair<int, int> pos:posicoes){
             tabuleiro_bonus.at(pos.second).at(pos.first) = letra_tripla;
         }
         posicoes = {{5, 5}, {5, 11}, {11, 5}, {11, 11}, {4, 4}
-,{4, 12}, {12, 4}, {12, 12}, {3, 3}, {3, 13}, {13, 3}, {13, 13}
-,{2, 2}, {2, 14}, {14, 2}, {14, 14}};
+        ,{4, 12}, {12, 4}, {12, 12}, {3, 3}, {3, 13}, {13, 3}, {13, 13}
+        ,{2, 2}, {2, 14}, {14, 2}, {14, 14}};
         bonus palavra_dupla = {"palavra", 2};
         for (pair<int, int> pos:posicoes){
             tabuleiro_bonus.at(pos.second).at(pos.first) = palavra_dupla;
         }
         posicoes = {{1, 1}, {15, 15}, {1, 15}, {15, 1}, {1, 8}    
-,{8, 1}, {15, 8}, {8, 15}};
+        ,{8, 1}, {15, 8}, {8, 15}};
         bonus palavra_tripla = {"palavra", 3};
         for (pair<int, int> pos:posicoes){
             tabuleiro_bonus.at(pos.second).at(pos.first) = palavra_tripla;
@@ -151,12 +151,18 @@ class Jogo
             printf("%02d", cont);
             for (int i=1;i<tabuleiro_pecas.at(e).size()-1;i++){
                 if (tabuleiro_bonus.at(e).at(i).tipo == "neutro"){
-                    cout << "| " << tabuleiro_pecas.at(e).at(i) << " ";
+                    printf("| \x1B[33m%c\033[0m ", tabuleiro_pecas.at(e).at(i));
                 } else if (tabuleiro_pecas.at(e).at(i) == ' '){
                     if (tabuleiro_bonus.at(e).at(i).tipo == "palavra"){
                         printf("| \x1B[31m*\033[0m ");
                     } else if(tabuleiro_bonus.at(e).at(i).tipo == "letra"){
                         printf("| \x1B[34m*\033[0m ");
+                    }
+                }else if (tabuleiro_pecas.at(e).at(i) != ' '){
+                    if (tabuleiro_bonus.at(e).at(i).tipo == "palavra"){
+                        printf("| \x1B[31m%c\033[0m ", tabuleiro_pecas.at(e).at(i));
+                    } else if(tabuleiro_bonus.at(e).at(i).tipo == "letra"){
+                        printf("| \x1B[34m%c\033[0m ", tabuleiro_pecas.at(e).at(i));
                     }
                 }
                 
@@ -172,12 +178,46 @@ class Jogo
         cout << "+" <<endl;
     }
 
-    long int calcula_pontos(string palavra){
+    long int calcula_pontos(string palavra, pair<int, int> pos, int index_ancora){
         long int pontos =0;
-        for (char letra:palavra){
-            pontos += valores_letras[letra];
+        int bonus_palavra = 1;
+        int direcao = get_direcao(pos);
+        int x = pos.first, y=pos.second;
+        if (index_ancora == -1) index_ancora = palavra.size()/2;
+        for (int i=index_ancora;i>=0;i--){
+            char letra = palavra.at(i);
+            bonus b_atual = tabuleiro_bonus.at(y).at(x);
+            if (b_atual.tipo == "palavra"){
+                bonus_palavra *= b_atual.multiplicador;
+                pontos += valores_letras[letra];
+            } else{
+                pontos += (valores_letras[letra]*b_atual.multiplicador);
+            }
+            if (direcao ==1){
+                y--;
+
+            } else if (direcao ==0){
+                x--;
+            }
         }
-        return pontos;
+        x = pos.first; y= pos.second;
+            
+        for (int i=index_ancora+1;i<palavra.size();i++){
+            if (direcao ==1){
+                y++;
+            } else if (direcao ==0){
+                x++;
+            }
+            char letra = palavra.at(i);
+            bonus b_atual = tabuleiro_bonus.at(y).at(x);
+            if (b_atual.tipo == "palavra"){
+                bonus_palavra *= b_atual.multiplicador;
+                pontos += valores_letras[letra];
+            } else{
+                pontos += valores_letras[letra]*b_atual.multiplicador;
+            }
+        }
+        return pontos*bonus_palavra;
     }
 
     int confere_movimento_legal(string palavra, pair<int, int> pos){
@@ -248,7 +288,7 @@ class Jogo
         tentativas.push_back(caminho);
         if (dic.procura(caminho)>=0){
             int index_ancora = confere_movimento_legal(caminho, pos);
-            tuple<long int, string, pair<int, int>, int> entrada = {calcula_pontos(caminho), caminho, pos, index_ancora};
+            tuple<long int, string, pair<int, int>, int> entrada = {calcula_pontos(caminho, pos, index_ancora), caminho, pos, index_ancora};
             if  (index_ancora>=0|| tabuleiro_pecas.at(pos.second).at(pos.first)==' ')
                 resultado_palavras.emplace(entrada);
         }
@@ -336,7 +376,7 @@ class Jogo
             }
             jogadores.at(vez).troca_peca(index_pecas_troca);
 
-
+            cout << "somando: " << get<long int>(resultado_palavras.top()) <<" + " << jogadores.at(vez).ponto << endl;
             jogadores.at(vez).ponto += get<long int>(resultado_palavras.top());
         } else{
             // troca todas as pecas
@@ -434,7 +474,7 @@ int main(){
     j.vez =0;
     while(i!=-1){
         auto start = std::chrono::high_resolution_clock::now();
-        //j.movimento();
+        j.movimento();
         auto end = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
         std::cout << "Tempo de processamento: " << duration.count() << " milliseconds" << std::endl;

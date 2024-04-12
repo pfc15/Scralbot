@@ -112,7 +112,7 @@ map<char, int> Dicionario::cria_valores(){
     valores['l'] = 2; 
     valores['c'] = 2; 
     valores['p'] = 2; 
-    valores['f'] = 4; 
+    valores['f'] = 4;
     valores['g'] = 4; 
     valores['h'] = 4; 
     valores['v'] = 4; 
