@@ -530,7 +530,7 @@ int main(){
         }
             
         if (opcao>1){
-            cout << "quer continuar? 'n' para sair";
+            cout << "quer continuar? [s/n]";
             cin >> i;
             if (i=="n") break;
         }
