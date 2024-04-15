@@ -493,6 +493,7 @@ int main(){
         std::cout << "Tempo de processamento: " << duration.count() << " milliseconds" << std::endl;
         if (j.sem_jogadas==3)
             break;
+        cin >> i;
     }
     cout << "Acabou o jogo!" << endl;
     
