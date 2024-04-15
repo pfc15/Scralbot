@@ -3,7 +3,7 @@
 using namespace std;
 
 // classe dicionario tem duas instancias do dicionario, uma em hash que é a variavel ht e outra em vetor que é a variável palavras
-// o hash é usado para confirmar palavras completas, o vetor para inicio de palavras
+// o hash é usado para confirmar palavras completas, o vetor para inicio de palavras (se deve continuar buscas)
 
 Dicionario::Dicionario(){
     // inicializando a hash
@@ -19,6 +19,7 @@ Dicionario::Dicionario(){
     palavras = {};
     int quant = ler_arquivo("../dic.txt", palavras);
     int cont =0;
+
     //adiconando todos na hash
     for (string p:palavras){
         n.palavra = p;
