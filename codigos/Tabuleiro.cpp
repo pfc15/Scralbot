@@ -31,6 +31,7 @@ class Jogo
         priority_queue<tuple<long int, string, pair<int, int>, int>> resultado_palavras;
         vector<string> tentativas;
         map<char, int> valores_letras;
+        int sem_jogadas = 0;
         
 
     Jogo(vector<string>  nomes){
@@ -63,7 +64,6 @@ class Jogo
     
 
         mostrar_tabuleiro();
-        cout << "criei o objeto!" << endl;
     };
 
     void init_matriz_bonus(){
@@ -75,20 +75,26 @@ class Jogo
                 tabuleiro_bonus.at(y).push_back(neutro);
             }
         }
+
+        // posições dos bonus de letra dupla
         vector<pair<int, int>> posicoes = {{7,7}, {7,9}, {9, 9}, {9, 7}, {4, 8}, {3, 7}  
         ,{3, 9}, {1, 4}, {1, 12}, {8, 4}, {7, 3}, {9, 3}, {4, 1}, {12, 1}
         ,{12, 8}, {13, 7}, {13, 9}, {15, 4}, {15, 11}, {8, 12}, {7, 13}
-        ,{9, 13}, {4, 15}, {12, 15}};
+        ,{9, 13}, {4, 15}, {12, 15}}; 
         bonus letra_dupla = {"letra", 2};
         for (pair<int, int> pos:posicoes){
             tabuleiro_bonus.at(pos.second).at(pos.first) = letra_dupla;
         }
+
+        // posições dos bonus de letra tripla
         posicoes = {{6,6}, {6, 10}, {10, 6}, {10, 10}, {2, 6},      
         {2, 10}, {6, 2}, {10, 2}, {14, 6}, {14, 10}, {5, 14}, {10, 14}};
         bonus letra_tripla = {"letra", 3};
         for (pair<int, int> pos:posicoes){
             tabuleiro_bonus.at(pos.second).at(pos.first) = letra_tripla;
         }
+
+        // posições dos bonus de palavra dupla
         posicoes = {{5, 5}, {5, 11}, {11, 5}, {11, 11}, {4, 4}
         ,{4, 12}, {12, 4}, {12, 12}, {3, 3}, {3, 13}, {13, 3}, {13, 13}
         ,{2, 2}, {2, 14}, {14, 2}, {14, 14}};
@@ -96,6 +102,8 @@ class Jogo
         for (pair<int, int> pos:posicoes){
             tabuleiro_bonus.at(pos.second).at(pos.first) = palavra_dupla;
         }
+
+        // posições dos bonus de palavra tripla
         posicoes = {{1, 1}, {15, 15}, {1, 15}, {15, 1}, {1, 8}    
         ,{8, 1}, {15, 8}, {8, 15}};
         bonus palavra_tripla = {"palavra", 3};
@@ -132,7 +140,7 @@ class Jogo
     };
 
     void mostrar_tabuleiro(){
-        //cout << "\033[2J\033[1;1H"; //limpa o terminal
+        cout << "\033[2J\033[1;1H"; //limpa o terminal
         for (Jogador j: jogadores){
             cout <<"nome: " << j.nome << "; peças: [" << j.pecas << "]; pontos: " << j.ponto << endl;
         }
@@ -178,12 +186,14 @@ class Jogo
         cout << "+" <<endl;
     }
 
+    // função para calcular pontos que uma palavra faz
     long int calcula_pontos(string palavra, pair<int, int> pos, int index_ancora){
         long int pontos =0;
         int bonus_palavra = 1;
         int direcao = get_direcao(pos);
         int x = pos.first, y=pos.second;
         if (index_ancora == -1) index_ancora = palavra.size()/2;
+        // parte antes da ancora
         for (int i=index_ancora;i>=0;i--){
             char letra = palavra.at(i);
             bonus b_atual = tabuleiro_bonus.at(y).at(x);
@@ -201,7 +211,7 @@ class Jogo
             }
         }
         x = pos.first; y= pos.second;
-            
+        // parte depois da ancora   
         for (int i=index_ancora+1;i<palavra.size();i++){
             if (direcao ==1){
                 y++;
@@ -220,6 +230,7 @@ class Jogo
         return pontos*bonus_palavra;
     }
 
+    // confere se o movimento é legal, depois da busca
     int confere_movimento_legal(string palavra, pair<int, int> pos){
         char ancora = tabuleiro_pecas.at(pos.second).at(pos.first);
         vector<int> index_ancoras = {};
@@ -288,9 +299,12 @@ class Jogo
         tentativas.push_back(caminho);
         if (dic.procura(caminho)>=0){
             int index_ancora = confere_movimento_legal(caminho, pos);
-            tuple<long int, string, pair<int, int>, int> entrada = {calcula_pontos(caminho, pos, index_ancora), caminho, pos, index_ancora};
-            if  (index_ancora>=0|| tabuleiro_pecas.at(pos.second).at(pos.first)==' ')
+            
+            if  (index_ancora>=0|| tabuleiro_pecas.at(pos.second).at(pos.first)==' '){
+                tuple<long int, string, pair<int, int>, int> entrada = {calcula_pontos(caminho, pos, index_ancora), caminho, pos, index_ancora};
                 resultado_palavras.emplace(entrada);
+            }
+                
         }
 
         // pegandoa as arestas
@@ -329,13 +343,10 @@ class Jogo
             aux.erase(i,1);
             tentaivas_quant += dfs(i,string(""), grafo, aux, pos);
         }
-        cout << "-=-=-=-=-=-=-=-=-=-=-=-=-==--=-=-=-=-=-=-=-=-==-===-=-=-==" << endl;
-        cout << "dfs completa! " << tentaivas_quant << " tentativas" << endl;
+
         if (resultado_palavras.empty()) return 0;
         string entrega = get<string>(resultado_palavras.top());
         pair< int, int> top_pos = get<pair<int, int>>(resultado_palavras.top());
-        cout << "1palavra: " << entrega << " topo: " << get<string>(resultado_palavras.top()) << " pos: " <<top_pos.first <<" " <<top_pos.second<< endl;
-        
         
         return 1;
     }
@@ -376,8 +387,8 @@ class Jogo
             }
             jogadores.at(vez).troca_peca(index_pecas_troca);
 
-            cout << "somando: " << get<long int>(resultado_palavras.top()) <<" + " << jogadores.at(vez).ponto << endl;
             jogadores.at(vez).ponto += get<long int>(resultado_palavras.top());
+            sem_jogadas =0;
         } else{
             // troca todas as pecas
             for(int i=0;i<jogadores.at(vez).pecas.size();i++){
@@ -385,6 +396,7 @@ class Jogo
             }
             jogadores.at(vez).troca_peca(index_pecas_troca);
             cout << "sem  palavras válidas" << endl; 
+            sem_jogadas++;
         }
         vez = (vez+1)%jogadores.size();
         mostrar_tabuleiro();
@@ -399,6 +411,7 @@ class Jogo
         return -1;
     }
 
+    // coloca a palavra no tabuleiro
     void posicionar(tuple<long int, string, pair<int, int>, int> topo){
         
         pair<int, int> pos = get<pair<int, int>>(topo); 
@@ -445,7 +458,7 @@ class Jogo
         }
     }
 
-    // anailise de se a posição é viável
+    // anailise de se a posição é viável antes da procura
     bool analise_pos(pair<int, int> pos){
         if (tabuleiro_pecas.at(pos.second).at(pos.first) != ' '){
             // verificando se é a ponta do tabuleiro
@@ -478,9 +491,9 @@ int main(){
         auto end = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
         std::cout << "Tempo de processamento: " << duration.count() << " milliseconds" << std::endl;
-        
-        cout << "digite 1 para prox jogador jogar: " ;
-        cin >> i;
+        if (j.sem_jogadas==3)
+            break;
     }
+    cout << "Acabou o jogo!" << endl;
     
 }

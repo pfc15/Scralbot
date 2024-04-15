@@ -18,8 +18,9 @@ void Jogador::troca_peca(vector<int> troca){
     }
 
 char Jogador::sortear_peca(){
+        // alfabeto é a string com a quantidade de peças que cada letra tem no jogo original. 14 A's, 3 B's etc
         string alfabeto = string("aaaaaaaaaaaaaabbbccccdddddeeeeeeeeeeeffgghhiiiiiiiiiijjkllllllmmmmmmnnnooooooooooopppppqrrrrrrsssssssssttttttuuuuuuuvvxyz");
-        int random_value = rand()%120;
+        int random_value = rand()%alfabeto.size();
         return alfabeto.at(random_value);
     }
 

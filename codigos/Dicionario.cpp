@@ -2,6 +2,8 @@
 #include "Dicionario.h"
 using namespace std;
 
+// classe dicionario tem duas instancias do dicionario, uma em hash que é a variavel ht e outra em vetor que é a variável palavras
+// o hash é usado para confirmar palavras completas, o vetor para inicio de palavras
 
 Dicionario::Dicionario(){
     // inicializando a hash
