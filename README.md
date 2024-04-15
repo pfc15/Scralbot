@@ -24,10 +24,11 @@ link do passo a passo de instalação: https://www.howtogeek.com/790062/how-to-i
 ## Uso
 apenas compile o código e siga as informações do terminal. Não codifiquei a possibilidade de jogadores humanos, então tem apenas a opção de ver o computador jogar contra ele mesmo.
 
-comandos para compilação pelo terminal
+comandos para compilação pelo terminal:<br>
+´´´console
 cd codigos
 g++ *.cpp -o scrabot.out
 ./scrabot.out
-
+´´´
 ## Outros
 A pasta DICIONARIOS tem um arquivo DicAberto.dict que tem o dicionário que utilizei como base, se tiver dúvida sobre o significado de alguma palavra vá para lá. outros arquivos complementares são a UML do projeto, e o artigo científico scrabble.pdf.
