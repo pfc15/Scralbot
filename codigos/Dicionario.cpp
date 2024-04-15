@@ -17,7 +17,7 @@ Dicionario::Dicionario(){
 
     //lendo o dicionario
     palavras = {};
-    int quant = ler_arquivo("../dic.txt", palavras);
+    int quant = ler_arquivo("../documentos/dic.txt", palavras);
     int cont =0;
 
     //adiconando todos na hash
@@ -85,9 +85,10 @@ long int Dicionario::encode(string chave)const{
 
 bool Dicionario::confere_aresta(string p){
     int comeco = 0; int final = palavras.size();
-    int posicao;
+    int posicao = (comeco +final)/2;
     while (posicao<palavras.size() && comeco<=final){
         posicao = (comeco +final)/2;
+        if (posicao >= palavras.size()) break;
         if (palavras.at(posicao).substr(0, p.size())==p){
             return true;
         }

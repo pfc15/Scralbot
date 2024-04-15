@@ -28,7 +28,8 @@ class Jogo
         vector<vector<char>> tabuleiro_pecas;
         vector<vector<bonus>> tabuleiro_bonus;
         Dicionario dic;
-        priority_queue<tuple<long int, string, pair<int, int>, int>> resultado_palavras;
+        //long int: pontos, string: palavra, pair: posição da ancora, int: index da ancora na palavra
+        priority_queue<tuple<long int, string, pair<int, int>, int>> resultado_palavras; 
         vector<string> tentativas;
         map<char, int> valores_letras;
         int sem_jogadas = 0;
@@ -356,7 +357,6 @@ class Jogo
         tentativas = {};
         pair<int, int> retorno;
         bool tabuleiro_vazio = true;
-        printf("procurando por letras\n");
         // procurando por letras
         for (int x=1;x<tabuleiro_pecas.size()-1;x++){
             for (int y=1;y<tabuleiro_pecas.size()-1;y++){
@@ -389,17 +389,20 @@ class Jogo
 
             jogadores.at(vez).ponto += get<long int>(resultado_palavras.top());
             sem_jogadas =0;
+            vez = (vez+1)%jogadores.size();
+            mostrar_tabuleiro();
         } else{
             // troca todas as pecas
             for(int i=0;i<jogadores.at(vez).pecas.size();i++){
                 index_pecas_troca.push_back(i);
             }
-            jogadores.at(vez).troca_peca(index_pecas_troca);
-            cout << "sem  palavras válidas" << endl; 
+            jogadores.at(vez).troca_peca(index_pecas_troca); 
             sem_jogadas++;
+            vez = (vez+1)%jogadores.size();
+            mostrar_tabuleiro();
+            cout << "sem  palavras válidas" << endl;
         }
-        vez = (vez+1)%jogadores.size();
-        mostrar_tabuleiro();
+        
     }
 
     int get_direcao(pair<int, int> pos){
@@ -493,7 +496,7 @@ int main(){
         std::cout << "Tempo de procura da palavra: " << duration.count() << " milliseconds" << std::endl;
         if (j.sem_jogadas==3) // jogo acaba
             break;
-        cin >> i;
+        //cin >> i;
     }
     cout << "Acabou o jogo!" << endl;
     
