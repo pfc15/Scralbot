@@ -488,11 +488,29 @@ class Jogo
 
 
 int main(){
-    vector<string> lista = {string("pedro"), string("pablo")};
+    int quant_jogadores=-1;
+    while (quant_jogadores<2 || quant_jogadores>4){
+        cout << "quantos jogadores vão jogar? entre 2 e 4";
+        cin >> quant_jogadores;
+    }
+    string nome;
+    vector<string> lista;
+    for (int i=0; i<quant_jogadores;i++){
+        cout << "qual nome do jogador " << 1+i <<": ";
+        cin >> nome;
+        lista.push_back(nome);
+    }
     Jogo j = Jogo(lista);
-    int i = 0;
+    string i = string("o");
     j.vez =0;
-    while(i!=-1) {
+    int opcao =0;
+    while (opcao<1 || opcao >3){
+        cout << "opções:\n1:jogadas em tempo real\n2:uma jogada de cada vez, ver todas as opções de jogadas\n3:uma jogada de cada vez, ver apenas o tabuleiro\n";
+        cin >> opcao;
+    }
+    
+
+    while(true) {
         auto start = std::chrono::high_resolution_clock::now();
         j.movimento();
         auto end = std::chrono::high_resolution_clock::now();
@@ -500,8 +518,23 @@ int main(){
         std::cout << "Tempo de procura da palavra: " << duration.count() << " milliseconds" << std::endl;
         if (j.sem_jogadas==3 || j.pecas_total == "") // jogo acaba
             break;
-        cout << j.pecas_total << endl;
-        //cin >> i;
+        if (opcao==2){
+            cout <<"-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-" << endl;
+            while(!j.resultado_palavras.empty()){
+                tuple<long int, string, pair<int, int>, int> topo = j.resultado_palavras.top();
+                j.resultado_palavras.pop();
+                cout << "ponto: " << get<long int>(topo) << " palavra: " << get<string>(topo) << " pos: [" << get<pair<int, int>>(topo).first << ", " << get<pair<int, int>>(topo).second << "]"<< endl;
+                cout << "------------------------------------------------------" <<endl;
+            }
+            cout <<"-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-" << endl;
+        }
+            
+        if (opcao>1){
+            cout << "quer continuar? 'n' para sair";
+            cin >> i;
+            if (i=="n") break;
+        }
+            
     }
     cout << "Acabou o jogo!" << endl;
     
