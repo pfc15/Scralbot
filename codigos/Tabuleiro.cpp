@@ -33,6 +33,8 @@ class Jogo
         vector<string> tentativas;
         map<char, int> valores_letras;
         int sem_jogadas = 0;
+        // alfabeto é a string com a quantidade de peças que cada letra tem no jogo original. 14 A's, 3 B's etc
+        string pecas_total = string("aaaaaaaaaaaaaabbbccccdddddeeeeeeeeeeeffgghhiiiiiiiiiijjkllllllmmmmmmnnnooooooooooopppppqrrrrrrsssssssssttttttuuuuuuuvvxyz");
         
 
     Jogo(vector<string>  nomes){
@@ -42,7 +44,7 @@ class Jogo
         // inicializando jogadores
         srand(time(0));
         for (string nome:nomes){
-            Jogador player = Jogador(nome);
+            Jogador player = Jogador(nome, pecas_total);
             jogadores.push_back(player);
         }
 
@@ -385,7 +387,7 @@ class Jogo
                 if (index>=0)
                     index_pecas_troca.push_back(index);
             }
-            jogadores.at(vez).troca_peca(index_pecas_troca);
+            pecas_total = jogadores.at(vez).troca_peca(index_pecas_troca, pecas_total);
 
             jogadores.at(vez).ponto += get<long int>(resultado_palavras.top());
             sem_jogadas =0;
@@ -396,7 +398,9 @@ class Jogo
             for(int i=0;i<jogadores.at(vez).pecas.size();i++){
                 index_pecas_troca.push_back(i);
             }
-            jogadores.at(vez).troca_peca(index_pecas_troca); 
+            string coloca_dvolta = jogadores.at(vez).pecas;
+            pecas_total = jogadores.at(vez).troca_peca(index_pecas_troca, pecas_total); 
+            pecas_total += coloca_dvolta;
             sem_jogadas++;
             vez = (vez+1)%jogadores.size();
             mostrar_tabuleiro();
@@ -488,14 +492,15 @@ int main(){
     Jogo j = Jogo(lista);
     int i = 0;
     j.vez =0;
-    while(i!=-1){
+    while(i!=-1) {
         auto start = std::chrono::high_resolution_clock::now();
         j.movimento();
         auto end = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
         std::cout << "Tempo de procura da palavra: " << duration.count() << " milliseconds" << std::endl;
-        if (j.sem_jogadas==3) // jogo acaba
+        if (j.sem_jogadas==3 || j.pecas_total == "") // jogo acaba
             break;
+        cout << j.pecas_total << endl;
         //cin >> i;
     }
     cout << "Acabou o jogo!" << endl;

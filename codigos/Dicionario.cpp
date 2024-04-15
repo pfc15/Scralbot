@@ -128,7 +128,3 @@ map<char, int> Dicionario::cria_valores(){
     valores['b'] = 3;
     return valores;
 };
-
-
-
-

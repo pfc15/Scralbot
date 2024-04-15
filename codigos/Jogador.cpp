@@ -2,26 +2,31 @@
 using namespace std;
 
 
-Jogador::Jogador(const string nome_){
+Jogador::Jogador(const string nome_, string pecas_total){
     for (int i =0; i<7; i++){
-        pecas.push_back(sortear_peca());
+        int novo = sortear_peca(pecas_total);
+        pecas.push_back(pecas_total.at(novo));
+        pecas_total.erase(pecas_total.begin()+novo);
     }
     pecas[7] = EOF;
     nome = nome_;
 }
 
-void Jogador::troca_peca(vector<int> troca){
+string Jogador::troca_peca(vector<int> troca, string pecas_total){
+
         for (int p:troca){
-            char novo = sortear_peca();
-            pecas[p] = novo;
+            int novo = sortear_peca(pecas_total);
+            pecas[p] = pecas_total.at(novo);
+            pecas_total.erase(pecas_total.begin()+novo);
+            if (pecas_total == "") break;
         }
+        return pecas_total;
     }
 
-char Jogador::sortear_peca(){
-        // alfabeto é a string com a quantidade de peças que cada letra tem no jogo original. 14 A's, 3 B's etc
-        string alfabeto = string("aaaaaaaaaaaaaabbbccccdddddeeeeeeeeeeeffgghhiiiiiiiiiijjkllllllmmmmmmnnnooooooooooopppppqrrrrrrsssssssssttttttuuuuuuuvvxyz");
-        int random_value = rand()%alfabeto.size();
-        return alfabeto.at(random_value);
+int Jogador::sortear_peca(string pecas_total){
+
+        int random_value = rand()%pecas_total.size();
+        return random_value;
     }
 
 void Jogador::add_pontos(int add){

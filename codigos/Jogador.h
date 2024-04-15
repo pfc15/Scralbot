@@ -10,9 +10,9 @@ public:
     string nome;
     int ponto =0;
 
-    Jogador(const string nome_);
-    void troca_peca(vector<int> troca);
-    char sortear_peca();
+    Jogador(const string nome_, string pecas_total);
+    string troca_peca(vector<int> troca, string pecas_total);
+    int sortear_peca(string pecas_total);
     void add_pontos(int add);
 };
 

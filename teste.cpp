@@ -1,12 +1,12 @@
 #include <bits/stdc++.h>
-# include "Dicionario.h"
 using namespace std;
 
 
 int main(){
-    Dicionario dic = Dicionario();
-    cout << "tamanho: " << dic.palavras.size() << endl;
-    cout << "palavra: " << dic.palavras.at(120288) << endl;
+    string a = string("ola tudo bem");
+    a += string(" testando");
+    a.erase(a.begin()+2);
+    cout << a << endl;
 
     printf("\x1B[31mTexting\033[0m\t\t"); // vermelho
     printf("\x1B[32mTexting\033[0m\t\t"); // verde
