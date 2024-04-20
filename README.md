@@ -1,6 +1,6 @@
 # Grafos1_Scrabot
 
-**Número da Lista**: X<br>
+**Número da Lista**: 27<br>
 **Conteúdo da Disciplina**: Grafos1, dfs<br>
 
 ## Alunos
