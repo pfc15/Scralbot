@@ -147,9 +147,9 @@ class Jogo
         for (Jogador j: jogadores){
             cout <<"nome: " << j.nome << "; peças: [" << j.pecas << "]; pontos: " << j.ponto << endl;
         }
-        int cont =0;
+        int cont =1;
         cout << "  ";
-        for (int i=0;i<15;i++){
+        for (int i=1;i<16;i++){
             printf(" %02d ", i);
         }
         cout << endl;
